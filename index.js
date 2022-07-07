@@ -1,8 +1,9 @@
 var posts = [];
 var filteredPosts = [];
 var users = [];
-let currentPage = 1;
-let limit = 10;
+var currentPage = 1;
+var limit = 10;
+var filterValue = 0
 
 var handleError = function (err) {
     console.warn(err);
@@ -46,7 +47,7 @@ function getPosts() {
         .then((data) => {
             posts = data;
             filteredPosts = data;
-            console.log(posts);
+            // console.log(posts);
             changePage(currentPage);
         })
         .catch((err) => handleError(err));
@@ -58,19 +59,10 @@ function getUsers() {
         .then((res) => res.json())
         .then((data) => {
             users = data;
-            console.log(users);
+            // console.log(users);
         })
         .catch((err) => handleError(err));
 }
-
-let ul = document.getElementById("posts");
-
-// handle pagination
-var paginator = document.getElementById("paginator");
-var prev_btn = document.getElementById("prev");
-var next_btn = document.getElementById("next");
-next_btn.addEventListener("click", nextPage);
-prev_btn.addEventListener("click", prevPage);
 
 function displayPost(i) {
     let li = document.createElement("li");
@@ -122,17 +114,57 @@ function changePage(page) {
     }
 }
 
-let searchInput = document.getElementById("search");
-searchInput.addEventListener("keyup", filterPosts);
-
 function filterPosts() {
-    let filterValue = searchInput.value.toLowerCase();
-    filteredPosts = posts.filter((post) =>
-        post.title.toLowerCase().includes(filterValue)
-    );
+    let searchValue = searchInput.value.toLowerCase();
+	let filterValue = filter.value;
+
+    filteredPosts = posts.filter((post) => {
+		let users_match;
+		let title_match = post.title.toLowerCase().includes(searchValue);
+		let body_match = post.body.toLowerCase().includes(searchValue);
+
+		users.map(user => {
+			if (user.id == post.userId) {
+				users_match = user.name.toLowerCase().includes(searchValue);
+			}
+		})
+
+		if (filterValue == 0) {
+			return title_match || body_match || users_match;
+		}
+		else if (filterValue == 1) {
+			return title_match;
+		} else if (filterValue == 2) {
+			return users_match;
+		} else if (filterValue == 3) {
+			return body_match;
+		}
+		
+	});
     changePage(1);
     // console.log(filteredPosts);
 }
+
+
+let ul = document.getElementById("posts");
+
+// handle input bar
+let searchInput = document.getElementById("search");
+searchInput.addEventListener("keyup", filterPosts);
+
+// handle input filter
+let filter = document.getElementById("filter");
+filter.addEventListener("change", (e) => {
+	filterValue = e.target.value;
+	filterPosts();
+});
+
+// handle pagination
+var paginator = document.getElementById("paginator");
+var prev_btn = document.getElementById("prev");
+var next_btn = document.getElementById("next");
+next_btn.addEventListener("click", nextPage);
+prev_btn.addEventListener("click", prevPage);
 
 // debugger
 window.onload = function () {
