@@ -1,15 +1,18 @@
-var posts = []
+var posts = [];
+var filteredPosts = [];
+var users = [];
 let currentPage = 1;
 let limit = 10;
 
 var handleError = function (err) {
-	console.warn(err);
-	return new Response(JSON.stringify({
-		code: 400,
-		message: 'Stupid network Error'
-	}));
+    console.warn(err);
+    return new Response(
+        JSON.stringify({
+            code: 400,
+            message: "Stupid network Error",
+        })
+    );
 };
-
 
 function searchPosts() {
     // Get the value of the input field.
@@ -17,98 +20,124 @@ function searchPosts() {
 }
 
 function prevPage() {
-	if (currentPage > 1) {
-		currentPage--;
-		changePage(currentPage)
-	}
+    if (currentPage > 1) {
+        currentPage--;
+        changePage(currentPage);
+    }
 }
 
 function nextPage() {
-	if (currentPage < limit) {
-		currentPage++;
-		changePage(currentPage)
-	}
+    if (currentPage < limit) {
+        currentPage++;
+        changePage(currentPage);
+    }
 }
 
 function numPages() {
-	return Math.ceil(posts.length / limit);
+    return Math.ceil(filteredPosts.length / limit);
 }
 
-// fetch Posts()
 // posts = await (await fetch(`https://jsonplaceholder.typicode.com/posts`).catch(err => handleError(err))).json()
-posts = fetch(`https://jsonplaceholder.typicode.com/posts`).then(res => res.json()).then(data => {
-	posts = data;
-	changePage(currentPage);
+
+function getPosts() {
+    // fetch the posts
+    fetch(`https://jsonplaceholder.typicode.com/posts`)
+        .then((res) => res.json())
+        .then((data) => {
+            posts = data;
+            filteredPosts = data;
+            console.log(posts);
+            changePage(currentPage);
+        })
+        .catch((err) => handleError(err));
 }
-).catch(err => handleError(err));
 
-let ul = document.getElementById('posts');
-// // let li = ul.querySelectorAll('li.collection-item');
+function getUsers() {
+    // get list of users
+    fetch(`https://jsonplaceholder.typicode.com/users`)
+        .then((res) => res.json())
+        .then((data) => {
+            users = data;
+            console.log(users);
+        })
+        .catch((err) => handleError(err));
+}
 
-// for (let i = 0; i < posts.length; i++) {
-// 	let li = document.createElement('li');
-// 	li.setAttribute('class', 'collection-item');
-// 	let a = document.createElement('a');
-// 	a.setAttribute('href', document.URL + '/' + posts[i].id);
-// 	a.innerHTML = posts[i].title;
-// 	li.appendChild(a);
-// 	ul.appendChild(li);
-// 	// console.log(posts[i].title);
-// }	
+let ul = document.getElementById("posts");
+
+// handle pagination
+var paginator = document.getElementById("paginator");
+var prev_btn = document.getElementById("prev");
+var next_btn = document.getElementById("next");
+next_btn.addEventListener("click", nextPage);
+prev_btn.addEventListener("click", prevPage);
+
+function displayPost(i) {
+    let li = document.createElement("li");
+    li.setAttribute("class", "collection-item");
+
+    let a = document.createElement("a");
+    a.setAttribute("href", document.URL + "/" + filteredPosts[i].id);
+    a.innerHTML = filteredPosts[i].title;
+
+	let user = users.find((user) => user.id == filteredPosts[i].userId);
+	let user_span = document.createElement("span");
+	user_span.setAttribute("class", "secondary-content");
+	user_span.innerHTML = user.name;
+	li.appendChild(user_span);
+
+    li.appendChild(a);
+    ul.appendChild(li);
+}
 
 function changePage(page) {
-	let prev_btn = document.getElementById('prev');
-	let next_btn = document.getElementById('next');
-	let paginator = document.getElementById('paginator');
-	let page_span = document.getElementById('page');
+    let page_span = document.getElementById("page");
 
-	if (page < 1) page = 1;
-	if (page > numPages()) page = numPages();
+    // boundary check
+    if (page < 1 || !numPages()) page = 1;
+    else if (page > numPages()) page = numPages();
 
-	ul.innerHTML = '';
+    // clear data from previous pages
+    ul.innerHTML = "";
 
-	for (let i = (page - 1) * limit; i < (page * limit) && i < posts.length; i++) {
-		console.log(i)
-		let li = document.createElement('li');
-		li.setAttribute('class', 'collection-item');
-		let a = document.createElement('a');
-		a.setAttribute('href', document.URL + '/' + posts[i].id);
-		a.innerHTML = posts[i].title;
-		li.appendChild(a);
-		ul.appendChild(li);
+    // display 10 posts of the page
+    for (let i = (page - 1) * limit; i < page * limit && i < filteredPosts.length; i++) {
+        // console.log(page, i, filteredPosts.length)
 
-	}
-	page_span.innerHTML = page;
-	if (page == 1) {
-		prev_btn.setAttribute('class', 'disabled');
-	}
-	else {
-		prev_btn.setAttribute('class', 'waves-effect');
-	}
+        displayPost(i);
+    }
+    // display page number
+    page_span.innerHTML = page;
 
-	if (page == numPages()) {
-		next_btn.setAttribute('class', 'disabled');
-	}
-	else {
-		next_btn.setAttribute('class', 'waves-effect');
-	}
+    if (page == 1) {
+        prev_btn.setAttribute("class", "btn disabled");
+    } else {
+        prev_btn.setAttribute("class", "waves-effect waves-light btn");
+    }
+
+    if (page == numPages() || !numPages()) {
+        next_btn.setAttribute("class", "btn disabled");
+    } else {
+        next_btn.setAttribute("class", "waves-effect waves-light btn");
+    }
 }
 
-// handle pagination 
-let paginator = document.getElementById('paginator');
-let prev_btn = document.getElementById('prev');
-let next_btn = document.getElementById('next');
-next_btn.addEventListener('click', nextPage);
-prev_btn.addEventListener('click', prevPage);
-
-
-
 let searchInput = document.getElementById("search");
-searchInput.addEventListener("keyup", searchPosts);
+searchInput.addEventListener("keyup", filterPosts);
+
+function filterPosts() {
+    let filterValue = searchInput.value.toLowerCase();
+    filteredPosts = posts.filter((post) =>
+        post.title.toLowerCase().includes(filterValue)
+    );
+    changePage(1);
+    // console.log(filteredPosts);
+}
 
 // debugger
 window.onload = function () {
-	// console.log(posts);
-	console.log('loaded');
-	// changePage(1);
-}
+    getUsers();
+    getPosts();
+    console.log("loaded");
+    // changePage(1);
+};
