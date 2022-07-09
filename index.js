@@ -38,11 +38,18 @@ function numPages() {
     return Math.ceil(filteredPosts.length / limit);
 }
 
-// posts = await (await fetch(`https://jsonplaceholder.typicode.com/posts`).catch(err => handleError(err))).json()
 
 function getPosts() {
-    // fetch the posts
-    fetch(`https://jsonplaceholder.typicode.com/posts`)
+	// fetch the posts
+	// posts = await (await fetch(`https://jsonplaceholder.typicode.com/posts`).catch(err => handleError(err))).json().then(data => {
+	// 	filteredPosts = data;
+	// 	changePage(1)
+	// })
+	// filteredPosts = [...posts];
+	// changePage(currentPage);
+	// console.log(filteredPosts)
+     
+	fetch(`https://jsonplaceholder.typicode.com/posts`)
         .then((res) => res.json())
         .then((data) => {
             posts = data;
@@ -50,6 +57,10 @@ function getPosts() {
             // console.log(posts);
             changePage(currentPage);
         })
+		.then(() => {
+			handleLocation()
+		}
+		)
         .catch((err) => handleError(err));
 }
 
@@ -62,20 +73,25 @@ function getUsers() {
             // console.log(users);
         })
         .catch((err) => handleError(err));
+	
+	// users = await (await fetch(`https://jsonplaceholder.typicode.com/users`).catch(err => handleError(err))).json()
+	// console.log(users)
 }
 
 function displayPost(i) {
-    let li = document.createElement("li");
+	let li = document.createElement("li");
     li.setAttribute("class", "collection-item");
-
+	
     let a = document.createElement("a");
-    a.setAttribute("href", document.URL + "/" + filteredPosts[i].id);
+    a.setAttribute("href", document.URL + filteredPosts[i].id);
     a.innerHTML = filteredPosts[i].title;
+	a.addEventListener("click", route)
 
 	let user = users.find((user) => user.id == filteredPosts[i].userId);
 	let user_span = document.createElement("span");
 	user_span.setAttribute("class", "secondary-content");
-	user_span.innerHTML = user.name;
+	// console.log(user_span)
+	user_span.innerHTML = user?.name;
 	li.appendChild(user_span);
 
     li.appendChild(a);
@@ -83,7 +99,8 @@ function displayPost(i) {
 }
 
 function changePage(page) {
-    let page_span = document.getElementById("page");
+    let page_span = document.getElementById("pageNumber");
+	// console.log(users)
 
     // boundary check
     if (page < 1 || !numPages()) page = 1;
@@ -112,6 +129,7 @@ function changePage(page) {
     } else {
         next_btn.setAttribute("class", "waves-effect waves-light btn");
     }
+
 }
 
 function filterPosts() {
@@ -173,3 +191,37 @@ window.onload = function () {
     console.log("loaded");
     // changePage(1);
 };
+
+function route(event) {
+	event = event || window.event
+	event.preventDefault()
+
+	history.pushState(null, null, event.target.href)
+	handleLocation()
+}
+
+const routes = {
+	// 404: "404.html",
+	'/': "index.html",
+	'/index.html': "index.html",
+	'/posts/:id': "post.html"
+}
+
+function handleLocation() {
+	const path = window.location.pathname
+	const route = routes[path] || routes[404]
+	console.log(path, route)	
+	// const html = fetch(route).then(res => res.text())
+	fetch(route).then(res => res.text()).then(html => {
+		// innerHTML = html
+		console.log(html)
+		// document.getElementById("main").innerHTML = html
+		// changePage(currentPage)
+	})
+	// document.getElementById("main").innerHTML = html
+}
+
+window.onpopstate = handleLocation
+window.route = route
+
+// handleLocation()
