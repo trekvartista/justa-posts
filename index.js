@@ -15,11 +15,6 @@ var handleError = function (err) {
     );
 };
 
-function searchPosts() {
-    // Get the value of the input field.
-    let searchValue = searchInput.value.toLowerCase();
-}
-
 function prevPage() {
     if (currentPage > 1) {
         currentPage--;
@@ -39,38 +34,18 @@ function numPages() {
 }
 
 async function getPosts() {
+
     // fetch the posts
     posts = await (await fetch(`https://jsonplaceholder.typicode.com/posts`).catch(err => handleError(err))).json().then(data => {
     	filteredPosts = data;
     	changePage(1)
     })
-    // filteredPosts = [...posts];
-    // changePage(currentPage);
-    // console.log(filteredPosts)
-
-    // fetch(`https://jsonplaceholder.typicode.com/posts`)
-    //     .then((res) => res.json())
-    //     .then((data) => {
-    //         posts = data;
-    //         filteredPosts = data;
-    //         // console.log(posts);
-    //         changePage(currentPage);
-    //     })
-    //     .catch((err) => handleError(err));
 }
 
 async function getUsers() {
-    // get list of users
-    // fetch(`https://jsonplaceholder.typicode.com/users`)
-    //     .then((res) => res.json())
-    //     .then((data) => {
-    //         users = data;
-    //         // console.log(users);
-    //     })
-    //     .catch((err) => handleError(err));
 
+    // get list of users
     users = await (await fetch(`https://jsonplaceholder.typicode.com/users`).catch(err => handleError(err))).json()
-    // console.log(users)
 }
 
 function displayPost(i) {
@@ -94,7 +69,6 @@ function displayPost(i) {
 
 function changePage(page) {
     let page_span = document.getElementById("pageNumber");
-    // console.log(users)
 
     // boundary check
     if (page < 1 || !numPages()) page = 1;
@@ -104,13 +78,10 @@ function changePage(page) {
     ul.innerHTML = "";
 
     // display 10 posts of the page
-    for (
-        let i = (page - 1) * limit;
-        i < page * limit && i < filteredPosts.length;
-        i++
-    ) {
+    for ( let i = (page - 1) * limit; i < page * limit && i < filteredPosts.length; i++ ) {
         displayPost(i);
     }
+
     // display page number
     page_span.innerHTML = page;
 
@@ -225,11 +196,11 @@ function routing() {
     // Fire route
     route.callback(param);
 }
-//Listener
+
+// Listener
 window.addEventListener('popstate', routing);
-//Initial call
+// Initial call
 setTimeout(routing, 0);
-//Add other routes
 
 
 window.onload = function () {
