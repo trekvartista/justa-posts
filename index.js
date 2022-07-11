@@ -87,9 +87,14 @@ export const displayPostPage = (params) => {
 	let post_div = document.createElement("div");
 
 	let user = users.find((user) => user.id == post.userId);
+	console.log(user);
 	let user_div = document.createElement("div");
 	user_div.setAttribute("class", "card-panel");
-	user_div.innerHTML = `<h5>${user?.name}</h5>`;
+	user_div.innerHTML = `
+		<div>
+			<h5><a href="mailto:${user?.email}">${user?.name}</a></h5>
+			<span> from <i>${user?.company?.name}</i> </span>	
+		</div>`;
 	
 	post_div.setAttribute("class", "card");
 	post_div.innerHTML = `
