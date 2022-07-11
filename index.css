@@ -10,8 +10,23 @@
 	margin-bottom: 60px;
 }
 
+.postLink {
+	text-decoration: none;
+	color: rgb(64, 64, 64);
+}
+
+.postLink:hover {
+	color: rgb(35, 35, 35);
+	font-weight: 500;
+}
+
 #filter {
 	border-radius: 10px;
 	padding: 2px;
 	cursor: pointer;
+}
+
+#heading:hover {
+	transform: scale(0.99);
+	transition: 0.2s ease-in-out;
 }

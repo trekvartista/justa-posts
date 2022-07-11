@@ -56,9 +56,15 @@ function displayPost(i) {
     let li = document.createElement("li");
     li.setAttribute("class", "collection-item");
 
+	let h5 = document.createElement("h5");
+
     let a = document.createElement("a");
+	a.className = "postLink"
     a.setAttribute("href", "#post/" + filteredPosts[i].id);
     a.innerHTML = filteredPosts[i].title;
+
+	let p = document.createElement("p");
+	p.innerHTML = filteredPosts[i].body;
 
     let user = users.find((user) => user.id == filteredPosts[i].userId);
     let user_span = document.createElement("span");
@@ -67,7 +73,9 @@ function displayPost(i) {
     user_span.innerHTML = user?.name;
     li.appendChild(user_span);
 
-    li.appendChild(a);
+	h5.appendChild(a);
+    li.appendChild(h5);
+	li.appendChild(p);
     ul.appendChild(li);
 }
 
