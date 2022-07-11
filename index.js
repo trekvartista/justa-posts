@@ -36,16 +36,20 @@ function numPages() {
 async function getPosts() {
 
     // fetch the posts
-    posts = await (await fetch(`https://jsonplaceholder.typicode.com/posts`).catch(err => handleError(err))).json().then(data => {
+    await (await fetch(`https://jsonplaceholder.typicode.com/posts`).catch(err => handleError(err))).json().then(data => {
     	filteredPosts = data;
+		posts = data;
     	changePage(1)
     })
+	// console.log(posts);
 }
 
 async function getUsers() {
 
     // get list of users
-    users = await (await fetch(`https://jsonplaceholder.typicode.com/users`).catch(err => handleError(err))).json()
+    await (await fetch(`https://jsonplaceholder.typicode.com/users`).catch(err => handleError(err))).json().then(data => {
+		users = data;
+	})
 }
 
 function displayPost(i) {
@@ -65,6 +69,29 @@ function displayPost(i) {
 
     li.appendChild(a);
     ul.appendChild(li);
+}
+
+export const displayPostPage = (params) => {
+
+	// console.log(users);
+	content.innerHTML = "";
+	let post = filteredPosts.find((post) => post.id == params);
+	let post_div = document.createElement("div");
+
+	let user = users.find((user) => user.id == post.userId);
+	let user_div = document.createElement("div");
+	user_div.setAttribute("class", "card-panel");
+	user_div.innerHTML = `<h5>${user?.name}</h5>`;
+	
+	post_div.setAttribute("class", "card");
+	post_div.innerHTML = `
+		<div class="card-content">
+			<span class="card-title"><b>${post?.title}</b></span>
+			<p>${post?.body}</p>
+		</div>
+	`;
+	post_div.appendChild(user_div);
+	content.appendChild(post_div);
 }
 
 function changePage(page) {
@@ -99,6 +126,7 @@ function changePage(page) {
 }
 
 function filterPosts() {
+
     let searchValue = searchInput.value.toLowerCase();
     let filterValue = filter.value;
 
@@ -148,59 +176,6 @@ var next_btn = document.getElementById("next");
 next_btn.addEventListener("click", nextPage);
 prev_btn.addEventListener("click", prevPage);
 
-
-
-function routing() {
-	const routes = [
-		{ path: "", callback: () => console.log("main page") },
-		{ path: "post/", callback: (params) => {
-			// console.log(params);
-			content.innerHTML = "";
-			let post = filteredPosts.find((post) => post.id == params);
-			let post_div = document.createElement("div");
-
-			let user = users.find((user) => user.id == post.userId);
-			let user_div = document.createElement("div");
-			user_div.setAttribute("class", "card-panel");
-			user_div.innerHTML = `<h5>${user.name}</h5>`;
-			
-			post_div.setAttribute("class", "card");
-			post_div.innerHTML = `
-				<div class="card-content">
-					<span class="card-title">${post.title}</span>
-					<p>${post.body}</p>
-				</div>
-			`;
-			post_div.appendChild(user_div);
-			content.appendChild(post_div);
-
-		} },
-		// { path: "/posts", callback: () => console.log("posts page") },
-	];
-
-    const hash = window.location.hash.substring(1).replace(/\//ig, '/');
-    //Default route is first registered route
-    let route = routes[0];
-    //Find matching route
-    for (let i = 0; i < routes.length; i++) {
-		let testRoute = routes[i];
-		// console.log(hash, testRoute.path);
-        if (hash.includes(testRoute.path)) {
-            route = testRoute;
-        }
-    }
-	// console.log(hash);
-	let param = hash.split(route.path)[1];
-	// console.log(param);
-
-    // Fire route
-    route.callback(param);
-}
-
-// Listener
-window.addEventListener('popstate', routing);
-// Initial call
-setTimeout(routing, 0);
 
 
 window.onload = function () {
