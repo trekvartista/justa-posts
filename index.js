@@ -135,6 +135,9 @@ export const dislpayTestPage = () => {
     let submit = document.createElement("input");
 
     first_input.setAttribute("type", "number");
+	if (localStorage.getItem("first_input")) {
+		first_input.value = localStorage.getItem("first_input");
+	}
     first_input.min = "1";
     first_input.max = "100000";
     first_input.setAttribute("id", "first_input");
@@ -144,6 +147,7 @@ export const dislpayTestPage = () => {
     );
     first_input.addEventListener("input", () => {
         second_input.value = first_input.value;
+		localStorage.setItem("first_input", first_input.value);
     });
 
     second_input.setAttribute("type", "number");
@@ -151,12 +155,18 @@ export const dislpayTestPage = () => {
     second_input.disabled = true;
 
     third_input.setAttribute("type", "number");
+	if (localStorage.getItem("third_input")) {
+		third_input.value = localStorage.getItem("third_input");
+	}
     third_input.min = "1";
     third_input.max = "12";
     third_input.setAttribute(
         "placeholder",
         "Enter numbers between 1 and 12..."
     );
+	third_input.addEventListener("input", () => {
+		localStorage.setItem("third_input", third_input.value);
+	});
 
     submit.setAttribute("class", "btn");
     submit.setAttribute("type", "submit");
