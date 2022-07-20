@@ -26,6 +26,15 @@
 	cursor: pointer;
 }
 
+.heading {
+	display: flex;
+	/* justify-content: center; */
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20px;
+	flex-direction: row;
+}
+
 #heading:hover {
 	transform: scale(0.99);
 	transition: 0.2s ease-in-out;
