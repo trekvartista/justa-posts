@@ -107,6 +107,42 @@ export const displayPostPage = (params) => {
 	content.appendChild(post_div);
 }
 
+export const dislpayTestPage = () => {
+	content.innerHTML = "";
+	let test_div = document.createElement("div");
+	test_div.setAttribute("class", "card-panel");
+	test_div.innerHTML = `
+		
+		<div class="card-content">
+			<span class="card-title"><b>Test Page</b></span>
+		</div>
+	`;
+
+	let first_input = document.createElement("input");
+	let second_input = document.createElement("input");
+
+	first_input.setAttribute("type", "number");
+	first_input.min = "1";
+	first_input.max = "100000";
+	first_input.setAttribute("id", "first_input");
+	first_input.oninput = function () {
+		second_input.value = first_input.value;
+		console.log(first_input.value);
+	}
+	
+	first_input.setAttribute("placeholder", "Enter numbers between 0 and 100000...");
+	// first_input.setAttribute("class", "input-field col s6");
+
+	second_input.setAttribute("type", "number");
+	second_input.disabled = true;
+	// console.log(first_input.value);
+	
+	test_div.appendChild(first_input);
+	test_div.appendChild(second_input);
+
+	content.appendChild(test_div);
+}
+
 function changePage(page) {
     let page_span = document.getElementById("pageNumber");
 
@@ -123,7 +159,7 @@ function changePage(page) {
     }
 
     // display page number
-    page_span.innerHTML = page;
+	if (page_span) page_span.innerHTML = page;
 
     if (page == 1) {
         prev_btn.setAttribute("class", "btn disabled");
