@@ -34,37 +34,47 @@ function numPages() {
 }
 
 async function getPosts() {
-
     // fetch the posts
-    await (await fetch(`https://jsonplaceholder.typicode.com/posts`).catch(err => handleError(err))).json().then(data => {
-    	filteredPosts = data;
-		posts = data;
-    	changePage(1)
-    })
-	// console.log(posts);
+    await (
+        await fetch(`https://jsonplaceholder.typicode.com/posts`).catch((err) =>
+            handleError(err)
+        )
+    )
+        .json()
+        .then((data) => {
+            filteredPosts = data;
+            posts = data;
+            changePage(1);
+        });
+    // console.log(posts);
 }
 
 async function getUsers() {
-
     // get list of users
-    await (await fetch(`https://jsonplaceholder.typicode.com/users`).catch(err => handleError(err))).json().then(data => {
-		users = data;
-	})
+    await (
+        await fetch(`https://jsonplaceholder.typicode.com/users`).catch((err) =>
+            handleError(err)
+        )
+    )
+        .json()
+        .then((data) => {
+            users = data;
+        });
 }
 
 function displayPost(i) {
     let li = document.createElement("li");
     li.setAttribute("class", "collection-item");
 
-	let h5 = document.createElement("h5");
+    let h5 = document.createElement("h5");
 
     let a = document.createElement("a");
-	a.className = "postLink"
+    a.className = "postLink";
     a.setAttribute("href", "#post/" + filteredPosts[i].id);
     a.innerHTML = filteredPosts[i].title;
 
-	let p = document.createElement("p");
-	p.innerHTML = filteredPosts[i].body;
+    let p = document.createElement("p");
+    p.innerHTML = filteredPosts[i].body;
 
     let user = users.find((user) => user.id == filteredPosts[i].userId);
     let user_span = document.createElement("span");
@@ -73,75 +83,115 @@ function displayPost(i) {
     user_span.innerHTML = user?.name;
     li.appendChild(user_span);
 
-	h5.appendChild(a);
+    h5.appendChild(a);
     li.appendChild(h5);
-	li.appendChild(p);
+    li.appendChild(p);
     ul.appendChild(li);
 }
 
 export const displayPostPage = (params) => {
+    // console.log(users);
+    content.innerHTML = "";
+    let post = filteredPosts.find((post) => post.id == params);
+    let post_div = document.createElement("div");
 
-	// console.log(users);
-	content.innerHTML = "";
-	let post = filteredPosts.find((post) => post.id == params);
-	let post_div = document.createElement("div");
-
-	let user = users.find((user) => user.id == post.userId);
-	console.log(user);
-	let user_div = document.createElement("div");
-	user_div.setAttribute("class", "card-panel");
-	user_div.innerHTML = `
+    let user = users.find((user) => user.id == post.userId);
+    console.log(user);
+    let user_div = document.createElement("div");
+    user_div.setAttribute("class", "card-panel");
+    user_div.innerHTML = `
 		<div>
 			<h5><a href="mailto:${user?.email}">${user?.name}</a></h5>
 			<span> from <i>${user?.company?.name}</i> </span>	
 		</div>`;
-	
-	post_div.setAttribute("class", "card");
-	post_div.innerHTML = `
+
+    post_div.setAttribute("class", "card");
+    post_div.innerHTML = `
 		<div class="card-content">
 			<span class="card-title"><b>${post?.title}</b></span>
 			<p>${post?.body}</p>
 		</div>
 	`;
-	post_div.appendChild(user_div);
-	content.appendChild(post_div);
-}
+    post_div.appendChild(user_div);
+    content.appendChild(post_div);
+};
 
 export const dislpayTestPage = () => {
-	content.innerHTML = "";
-	let test_div = document.createElement("div");
-	test_div.setAttribute("class", "card-panel");
-	test_div.innerHTML = `
+    content.innerHTML = "";
+    let test_div = document.createElement("div");
+    test_div.setAttribute("class", "card-panel");
+    test_div.innerHTML = `
 		
 		<div class="card-content">
 			<span class="card-title"><b>Test Page</b></span>
 		</div>
 	`;
 
-	let first_input = document.createElement("input");
-	let second_input = document.createElement("input");
+    let form = document.createElement("form");
 
-	first_input.setAttribute("type", "number");
-	first_input.min = "1";
-	first_input.max = "100000";
-	first_input.setAttribute("id", "first_input");
-	first_input.oninput = function () {
-		second_input.value = first_input.value;
-		console.log(first_input.value);
-	}
-	
-	first_input.setAttribute("placeholder", "Enter numbers between 0 and 100000...");
-	// first_input.setAttribute("class", "input-field col s6");
+    let first_input = document.createElement("input");
+    let second_input = document.createElement("input");
+    let third_input = document.createElement("input");
+    let submit = document.createElement("input");
 
-	second_input.setAttribute("type", "number");
-	second_input.disabled = true;
-	// console.log(first_input.value);
-	
-	test_div.appendChild(first_input);
-	test_div.appendChild(second_input);
+    first_input.setAttribute("type", "number");
+    first_input.min = "1";
+    first_input.max = "100000";
+    first_input.setAttribute("id", "first_input");
+    first_input.setAttribute(
+        "placeholder",
+        "Enter numbers between 0 and 100000..."
+    );
+    first_input.addEventListener("input", () => {
+        second_input.value = first_input.value;
+    });
 
-	content.appendChild(test_div);
-}
+    second_input.setAttribute("type", "number");
+    second_input.placeholder = "Disabled input...";
+    second_input.disabled = true;
+
+    third_input.setAttribute("type", "number");
+    third_input.min = "1";
+    third_input.max = "12";
+    third_input.setAttribute(
+        "placeholder",
+        "Enter numbers between 1 and 12..."
+    );
+
+    submit.setAttribute("class", "btn");
+    submit.setAttribute("type", "submit");
+    submit.innerHTML = "Submit";
+    submit.addEventListener("click", () => {
+        // console.log(first_input.value);
+		if (first_input.checkValidity() && third_input.checkValidity()) {
+			fetch(`https://jsonplaceholder.typicode.com/posts`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					userId: 42,
+					title: "Test Post",
+					body: `This is a test post\nFirst input value: ${first_input.value}\nSecond input value: ${second_input.value}\nThird input value: ${third_input.value}`,
+				}),
+			})
+				.then((res) => res.json())
+				.then((data) => {
+					console.log(data);
+				});
+		} else {
+			console.log("Invalid input");
+		}
+    });
+
+    form.appendChild(first_input);
+    form.appendChild(second_input);
+    form.appendChild(third_input);
+    form.appendChild(submit);
+
+    test_div.appendChild(form);
+    content.appendChild(test_div);
+};
 
 function changePage(page) {
     let page_span = document.getElementById("pageNumber");
@@ -154,12 +204,16 @@ function changePage(page) {
     ul.innerHTML = "";
 
     // display 10 posts of the page
-    for ( let i = (page - 1) * limit; i < page * limit && i < filteredPosts.length; i++ ) {
+    for (
+        let i = (page - 1) * limit;
+        i < page * limit && i < filteredPosts.length;
+        i++
+    ) {
         displayPost(i);
     }
 
     // display page number
-	if (page_span) page_span.innerHTML = page;
+    if (page_span) page_span.innerHTML = page;
 
     if (page == 1) {
         prev_btn.setAttribute("class", "btn disabled");
@@ -175,7 +229,6 @@ function changePage(page) {
 }
 
 function filterPosts() {
-
     let searchValue = searchInput.value.toLowerCase();
     let filterValue = filter.value;
 
@@ -224,8 +277,6 @@ var prev_btn = document.getElementById("prev");
 var next_btn = document.getElementById("next");
 next_btn.addEventListener("click", nextPage);
 prev_btn.addEventListener("click", prevPage);
-
-
 
 window.onload = function () {
     getUsers();
